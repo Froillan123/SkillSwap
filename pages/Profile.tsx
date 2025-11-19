@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { MapPin, Edit2, Plus, Trash2, Award, Sparkles, ExternalLink, Briefcase, Dna } from 'lucide-react';
-import { User, SkillCategory, PortfolioItem } from '../types';
+import { MapPin, Edit2, Plus, Award, Sparkles, ExternalLink, Briefcase, Dna } from 'lucide-react';
+import { User, SkillCategory } from '../types';
 import { suggestSkills } from '../services/geminiService';
 
 const INITIAL_PROFILE: User = {
@@ -49,9 +49,7 @@ const INITIAL_PROFILE: User = {
 
 // Simple SVG Radar Chart Component
 const RadarChart = ({ dna }: { dna: { creative: number; analytical: number; visual: number; auditory: number } }) => {
-  // Center is 100, 100. Radius is 80.
   const center = 100;
-  const scale = 0.8; // Radius multiplier
   
   const getPoint = (value: number, angle: number) => {
     const r = (value / 100) * 80;
@@ -60,8 +58,6 @@ const RadarChart = ({ dna }: { dna: { creative: number; analytical: number; visu
     return `${x},${y}`;
   };
 
-  // Angles: Creative (Top, -PI/2), Analytical (Right, 0), Visual (Bottom, PI/2), Auditory (Left, PI)
-  // Actually let's do 4 points evenly distributed: -90, 0, 90, 180 degrees
   const p1 = getPoint(dna.creative, -Math.PI / 2); // Top
   const p2 = getPoint(dna.analytical, 0);          // Right
   const p3 = getPoint(dna.visual, Math.PI / 2);    // Bottom
@@ -119,14 +115,14 @@ export const Profile: React.FC = () => {
             )}
         </div>
 
-        <div className="px-8 pb-8 relative">
-          <div className="flex flex-col md:flex-row justify-between items-end md:items-start -mt-16 mb-6">
-            <div className="flex items-end gap-6">
-              <div className={`w-32 h-32 rounded-3xl border-4 shadow-2xl overflow-hidden bg-dark-card relative z-10 ${user.isPro ? 'border-yellow-500' : 'border-dark-card'}`}>
+        <div className="px-6 md:px-8 pb-8 relative">
+          <div className="flex flex-col md:flex-row justify-between items-start -mt-16 mb-6 gap-4">
+            <div className="flex flex-col md:flex-row items-start md:items-end gap-4 md:gap-6">
+              <div className={`w-32 h-32 rounded-3xl border-4 shadow-2xl overflow-hidden bg-dark-card relative z-10 flex-shrink-0 ${user.isPro ? 'border-yellow-500' : 'border-dark-card'}`}>
                 <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
               </div>
-              <div className="mb-2 relative z-10">
-                <h1 className="text-3xl font-bold text-white flex items-center gap-2">
+              <div className="mb-2 relative z-10 pt-2 md:pt-0">
+                <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
                   {user.name}
                   {user.isPro && <Sparkles className="text-yellow-500" fill="currentColor" size={20} />}
                 </h1>
@@ -137,22 +133,22 @@ export const Profile: React.FC = () => {
             </div>
             <button 
               onClick={() => setIsEditing(!isEditing)}
-              className="mt-4 md:mt-0 px-4 py-2 bg-gray-800 text-white font-bold rounded-xl hover:bg-gray-700 hover:text-neon-cyan transition-colors flex items-center gap-2 text-sm border border-gray-700"
+              className="mt-0 w-full md:w-auto px-4 py-2 bg-gray-800 text-white font-bold rounded-xl hover:bg-gray-700 hover:text-neon-cyan transition-colors flex items-center justify-center gap-2 text-sm border border-gray-700"
             >
-              <Edit2 size={16} /> {isEditing ? 'Save Profile' : 'Edit Profile'}
+              <Edit2 size={16} /> {isEditing ? 'Save' : 'Edit'}
             </button>
           </div>
 
-          <p className="text-gray-300 max-w-2xl leading-relaxed text-lg mb-8 font-light">
+          <p className="text-gray-300 max-w-2xl leading-relaxed text-base md:text-lg mb-8 font-light">
             {user.bio}
           </p>
 
-          <div className="flex flex-wrap gap-4 mb-8">
-            <div className="bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20 px-4 py-2 rounded-xl font-bold flex items-center gap-2">
+          <div className="flex flex-wrap gap-3 md:gap-4 mb-8">
+            <div className="bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20 px-4 py-2 rounded-xl font-bold flex items-center gap-2 text-sm">
               <Award size={18} /> Level {user.level}
             </div>
             {user.badges.map((badge, i) => (
-              <div key={i} className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-4 py-2 rounded-xl font-bold flex items-center gap-2 shadow-[0_0_10px_rgba(234,179,8,0.1)]">
+              <div key={i} className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-4 py-2 rounded-xl font-bold flex items-center gap-2 shadow-[0_0_10px_rgba(234,179,8,0.1)] text-sm">
                 <Sparkles size={14} /> {badge}
               </div>
             ))}
@@ -256,7 +252,7 @@ export const Profile: React.FC = () => {
               <div className="grid gap-6">
                 {user.portfolio?.map(item => (
                   <div key={item.id} className="bg-dark-bg rounded-xl overflow-hidden border border-gray-800 flex flex-col md:flex-row hover:border-gray-600 transition-colors group">
-                    <div className="w-full md:w-48 h-32 bg-gray-800 flex-shrink-0 relative overflow-hidden">
+                    <div className="w-full md:w-48 h-48 md:h-auto bg-gray-800 flex-shrink-0 relative overflow-hidden">
                        <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                     <div className="p-5 flex-1">

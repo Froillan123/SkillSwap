@@ -18,8 +18,8 @@ const App: React.FC = () => {
       <div className="min-h-screen bg-dark-bg text-gray-200 font-sans flex flex-col md:flex-row">
         <Navigation />
         
-        {/* Main Content Area - Margin adjusted to 64 (16rem) to match Navigation width */}
-        <main className="flex-1 md:ml-64 pb-24 md:pb-8 p-4 md:p-8 max-w-7xl mx-auto min-h-screen w-full transition-all duration-300">
+        {/* Main Content Area - Responsive padding and max-width */}
+        <main className="flex-1 md:ml-64 pb-24 md:pb-8 p-4 md:p-8 max-w-full md:max-w-[calc(100%-16rem)] xl:max-w-7xl mx-auto min-h-screen w-full transition-all duration-300">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/resources" element={<ResourcesPage />} />

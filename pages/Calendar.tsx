@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Video, MapPin } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, getDay } from 'date-fns';
@@ -77,11 +78,11 @@ export const CalendarPage: React.FC = () => {
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 h-[calc(100vh-6rem)] animate-in fade-in duration-500">
+    <div className="flex flex-col xl:flex-row gap-8 h-auto xl:h-[calc(100vh-6rem)] animate-in fade-in duration-500">
       {/* Left Panel: Calendar Grid */}
-      <div className="flex-1 bg-dark-card border border-dark-border rounded-2xl p-6 shadow-lg flex flex-col">
+      <div className="flex-1 bg-dark-card border border-dark-border rounded-2xl p-4 md:p-6 shadow-lg flex flex-col">
         {/* Calendar Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
           <h2 className="text-2xl font-bold text-white flex items-center gap-3">
             <CalendarIcon className="text-neon-cyan" />
             {format(currentDate, 'MMMM yyyy')}
@@ -102,14 +103,14 @@ export const CalendarPage: React.FC = () => {
         {/* Days Header */}
         <div className="grid grid-cols-7 mb-4">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center text-gray-500 text-sm font-mono uppercase tracking-wider">
+            <div key={day} className="text-center text-gray-500 text-xs md:text-sm font-mono uppercase tracking-wider">
               {day}
             </div>
           ))}
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-2 lg:gap-4 flex-1 auto-rows-fr">
+        <div className="grid grid-cols-7 gap-1 md:gap-2 lg:gap-4 flex-1 auto-rows-fr min-h-[300px]">
           {paddingDays.map((_, i) => (
             <div key={`padding-${i}`} className="bg-transparent" />
           ))}
@@ -124,13 +125,13 @@ export const CalendarPage: React.FC = () => {
               <button
                 key={i}
                 onClick={() => setSelectedDate(day)}
-                className={`relative rounded-xl p-2 flex flex-col items-center transition-all duration-200 group
+                className={`relative rounded-xl p-2 flex flex-col items-center transition-all duration-200 group min-h-[50px] md:min-h-[80px]
                   ${isSelected ? 'bg-white/10 ring-2 ring-neon-cyan shadow-[0_0_10px_rgba(0,255,209,0.2)]' : 'hover:bg-white/5'}
                   ${!isCurrentMonth ? 'opacity-30' : 'opacity-100'}
                   ${isTodayDate ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'bg-dark-bg/50'}
                 `}
               >
-                <span className={`text-sm font-medium mb-1 ${
+                <span className={`text-xs md:text-sm font-medium mb-1 ${
                   isTodayDate ? 'text-neon-cyan font-bold' : 
                   isSelected ? 'text-white' : 'text-gray-400'
                 }`}>
@@ -138,7 +139,7 @@ export const CalendarPage: React.FC = () => {
                 </span>
                 
                 {/* Dots for sessions */}
-                <div className="flex gap-1 mt-1">
+                <div className="flex gap-1 mt-1 flex-wrap justify-center">
                   {daySessions.map((s, idx) => (
                     <div 
                       key={idx} 
@@ -155,13 +156,13 @@ export const CalendarPage: React.FC = () => {
       </div>
 
       {/* Right Panel: Agenda / Details */}
-      <div className="w-full lg:w-96 bg-dark-card border border-dark-border rounded-2xl p-6 shadow-lg flex flex-col">
+      <div className="w-full xl:w-96 bg-dark-card border border-dark-border rounded-2xl p-6 shadow-lg flex flex-col h-[500px] xl:h-auto">
         <div className="mb-6 pb-6 border-b border-gray-800">
           <h3 className="text-gray-400 font-mono text-sm uppercase tracking-wider mb-1">Selected Date</h3>
           <h2 className="text-3xl font-bold text-white">{format(selectedDate, 'EEEE, MMM do')}</h2>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-4">
+        <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar">
           {selectedDaySessions.length === 0 ? (
              <div className="flex flex-col items-center justify-center h-48 text-gray-500">
                <Clock size={48} className="mb-4 opacity-20" />

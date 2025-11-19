@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Phone, Video, MoreVertical, Check } from 'lucide-react';
 import { ChatMessage } from '../types';
@@ -67,7 +68,7 @@ export const Messages: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-6rem)] bg-dark-card rounded-2xl border border-dark-border overflow-hidden shadow-lg animate-in fade-in duration-500">
+    <div className="flex h-[calc(100dvh-6rem)] md:h-[calc(100vh-6rem)] bg-dark-card rounded-2xl border border-dark-border overflow-hidden shadow-lg animate-in fade-in duration-500">
       {/* Contacts List */}
       <div className={`w-full md:w-80 border-r border-dark-border flex flex-col ${selectedContactId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-dark-border">

@@ -101,71 +101,73 @@ const BookingModal = ({
   const [step, setStep] = useState(1);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-dark-card w-full max-w-md rounded-2xl border border-dark-border shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-dark-card w-full max-w-md rounded-2xl border border-dark-border shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-gray-800 flex justify-between items-center">
+        <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-dark-card">
           <h3 className="text-xl font-bold text-white">
             {listing.type === 'mentor' ? 'Hire Mentor' : 'Request Swap'}
           </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-white"><X size={24} /></button>
         </div>
 
-        {step === 1 ? (
-          <div className="p-6 space-y-6">
-            <div className="flex items-center gap-4">
-              <img src={listing.avatar} className="w-16 h-16 rounded-full object-cover border-2 border-gray-700" alt="" />
-              <div>
-                <p className="font-bold text-white text-lg">{listing.name}</p>
-                <p className="text-gray-400">{listing.skillName}</p>
+        <div className="overflow-y-auto p-6 custom-scrollbar">
+          {step === 1 ? (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <img src={listing.avatar} className="w-16 h-16 rounded-full object-cover border-2 border-gray-700" alt="" />
+                <div>
+                  <p className="font-bold text-white text-lg">{listing.name}</p>
+                  <p className="text-gray-400">{listing.skillName}</p>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-3">
-              <label className="block text-sm font-bold text-gray-300">Select Date</label>
-              <input type="date" className="w-full bg-dark-bg border border-gray-700 rounded-lg p-3 text-white focus:border-neon-cyan outline-none" />
-              
-              <label className="block text-sm font-bold text-gray-300">Select Time</label>
-              <select className="w-full bg-dark-bg border border-gray-700 rounded-lg p-3 text-white focus:border-neon-cyan outline-none">
-                <option>10:00 AM</option>
-                <option>02:00 PM</option>
-                <option>04:30 PM</option>
-              </select>
-            </div>
-
-            {listing.type === 'mentor' && (
-              <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl flex justify-between items-center">
-                <span className="text-yellow-500 font-bold">Total (1 hr)</span>
-                <span className="text-white font-bold text-xl">${listing.hourlyRate}</span>
+              <div className="space-y-3">
+                <label className="block text-sm font-bold text-gray-300">Select Date</label>
+                <input type="date" className="w-full bg-dark-bg border border-gray-700 rounded-lg p-3 text-white focus:border-neon-cyan outline-none" />
+                
+                <label className="block text-sm font-bold text-gray-300">Select Time</label>
+                <select className="w-full bg-dark-bg border border-gray-700 rounded-lg p-3 text-white focus:border-neon-cyan outline-none">
+                  <option>10:00 AM</option>
+                  <option>02:00 PM</option>
+                  <option>04:30 PM</option>
+                </select>
               </div>
-            )}
 
-            <button 
-              onClick={() => setStep(2)}
-              className="w-full py-3 rounded-xl bg-neon-cyan text-black font-bold hover:bg-white transition-colors"
-            >
-              {listing.type === 'mentor' ? 'Proceed to Payment' : 'Send Request'}
-            </button>
-          </div>
-        ) : (
-          <div className="p-8 text-center space-y-4">
-            <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle size={40} />
+              {listing.type === 'mentor' && (
+                <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl flex justify-between items-center">
+                  <span className="text-yellow-500 font-bold">Total (1 hr)</span>
+                  <span className="text-white font-bold text-xl">${listing.hourlyRate}</span>
+                </div>
+              )}
+
+              <button 
+                onClick={() => setStep(2)}
+                className="w-full py-3 rounded-xl bg-neon-cyan text-black font-bold hover:bg-white transition-colors"
+              >
+                {listing.type === 'mentor' ? 'Proceed to Payment' : 'Send Request'}
+              </button>
             </div>
-            <h3 className="text-2xl font-bold text-white">Success!</h3>
-            <p className="text-gray-400">
-              {listing.type === 'mentor' 
-                ? 'Your session has been booked. Check your email for details.' 
-                : 'Swap request sent! Wait for them to accept.'}
-            </p>
-            <button 
-              onClick={onConfirm}
-              className="w-full py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors mt-4"
-            >
-              Close
-            </button>
-          </div>
-        )}
+          ) : (
+            <div className="text-center space-y-4 py-4">
+              <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle size={40} />
+              </div>
+              <h3 className="text-2xl font-bold text-white">Success!</h3>
+              <p className="text-gray-400">
+                {listing.type === 'mentor' 
+                  ? 'Your session has been booked. Check your email for details.' 
+                  : 'Swap request sent! Wait for them to accept.'}
+              </p>
+              <button 
+                onClick={onConfirm}
+                className="w-full py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors mt-4"
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -256,7 +258,7 @@ export const Marketplace: React.FC = () => {
         {filteredListings.map((listing) => (
           <div 
             key={listing.id} 
-            className={`bg-dark-card rounded-2xl overflow-hidden transition-all duration-300 group relative ${
+            className={`bg-dark-card rounded-2xl overflow-hidden transition-all duration-300 group relative flex flex-col ${
               listing.type === 'mentor' 
                 ? 'border border-yellow-500/30 hover:border-yellow-500 shadow-[0_0_0_1px_rgba(234,179,8,0.1)]' 
                 : 'border border-dark-border hover:border-neon-cyan/40 hover:shadow-[0_0_20px_rgba(0,255,209,0.1)]'
@@ -267,7 +269,7 @@ export const Marketplace: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-50 pointer-events-none" />
             )}
             
-            <div className="p-6 relative z-10">
+            <div className="p-6 relative z-10 flex-1 flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                   <div className="relative">
@@ -290,7 +292,7 @@ export const Marketplace: React.FC = () => {
                 </div>
               </div>
               
-              <div className="mb-4 min-h-[100px]">
+              <div className="mb-4 flex-1">
                 <span className="inline-block px-2 py-1 bg-gray-800 text-gray-300 text-[10px] font-bold uppercase tracking-wider rounded-md mb-2 border border-gray-700">
                   {listing.category}
                 </span>
@@ -300,7 +302,7 @@ export const Marketplace: React.FC = () => {
                 <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">{listing.description}</p>
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+              <div className="flex items-center justify-between pt-4 border-t border-gray-800 mt-auto">
                 {listing.type === 'mentor' ? (
                   <div className="flex flex-col">
                     <span className="text-xs text-gray-500">Rate</span>

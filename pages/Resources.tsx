@@ -98,7 +98,7 @@ export const ResourcesPage: React.FC = () => {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
             <Layers className="text-neon-purple" /> Global Skill Feed
           </h1>
           <p className="text-gray-500 mt-1">Curated resources. Mine skills to earn SkillCoins.</p>
@@ -107,10 +107,10 @@ export const ResourcesPage: React.FC = () => {
         <button 
           onClick={handleGenerateRoadmap}
           disabled={roadmapLoading}
-          className="bg-gradient-to-r from-neon-cyan to-blue-600 text-black font-bold px-6 py-3 rounded-xl shadow-[0_0_20px_rgba(0,255,209,0.3)] hover:shadow-[0_0_30px_rgba(0,255,209,0.5)] transition-all flex items-center gap-2"
+          className="w-full md:w-auto bg-gradient-to-r from-neon-cyan to-blue-600 text-black font-bold px-6 py-3 rounded-xl shadow-[0_0_20px_rgba(0,255,209,0.3)] hover:shadow-[0_0_30px_rgba(0,255,209,0.5)] transition-all flex items-center justify-center gap-2"
         >
           {roadmapLoading ? <Zap className="animate-spin" /> : <Zap fill="currentColor" />}
-          {roadmapLoading ? 'Analyzing Feed...' : 'Generate AI Roadmap'}
+          {roadmapLoading ? 'Analyzing...' : 'AI Roadmap'}
         </button>
       </div>
 
@@ -122,10 +122,10 @@ export const ResourcesPage: React.FC = () => {
           <div className="space-y-3 relative z-10">
             {generatedRoadmap.map((step, idx) => (
               <div key={idx} className="flex items-center gap-4 p-3 bg-black/40 rounded-lg border border-gray-700">
-                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-neon-cyan text-black font-bold text-sm">
+                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-neon-cyan text-black font-bold text-sm flex-shrink-0">
                    {idx + 1}
                  </span>
-                 <span className="text-gray-200">{step}</span>
+                 <span className="text-gray-200 text-sm">{step}</span>
               </div>
             ))}
           </div>
@@ -133,7 +133,7 @@ export const ResourcesPage: React.FC = () => {
       )}
 
       {/* Filters */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
         {['All', 'Video', 'Article', 'Course', 'Repo', 'Premium'].map(f => (
           <button
             key={f}
