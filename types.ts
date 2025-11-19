@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -10,6 +11,18 @@ export interface User {
   skillsOffered: Skill[];
   skillsWanted: Skill[];
   portfolio?: PortfolioItem[];
+  skillDNA?: SkillDNA;
+  wallet?: {
+    skillCoins: number;
+  };
+}
+
+export interface SkillDNA {
+  creative: number;
+  analytical: number;
+  visual: number;
+  auditory: number;
+  bestType: string;
 }
 
 export interface Mentor extends User {
@@ -67,6 +80,7 @@ export interface Resource {
   category: SkillCategory;
   likes: number;
   isPremium: boolean;
+  miningReward: number; // Coins earned by watching
 }
 
 export interface Challenge {
@@ -78,6 +92,7 @@ export interface Challenge {
   prize: string;
   image: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
+  userJoined?: boolean;
 }
 
 export interface PortfolioItem {
@@ -87,4 +102,17 @@ export interface PortfolioItem {
   image: string;
   link?: string;
   skillsUsed: string[];
+}
+
+export interface CareerStep {
+  title: string;
+  description: string;
+  duration: string;
+  skills: string[];
+}
+
+export interface CareerPath {
+  jobTitle: string;
+  steps: CareerStep[];
+  estimatedSalary: string;
 }

@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { MapPin, Edit2, Plus, Trash2, Award, Sparkles, ExternalLink, Briefcase } from 'lucide-react';
+import { MapPin, Edit2, Plus, Trash2, Award, Sparkles, ExternalLink, Briefcase, Dna } from 'lucide-react';
 import { User, SkillCategory, PortfolioItem } from '../types';
 import { suggestSkills } from '../services/geminiService';
 
@@ -36,7 +37,64 @@ const INITIAL_PROFILE: User = {
       skillsUsed: ['Writing', 'Editing'],
       link: '#'
     }
-  ]
+  ],
+  skillDNA: {
+    creative: 82,
+    analytical: 73,
+    visual: 91,
+    auditory: 22,
+    bestType: "Art & Programming"
+  }
+};
+
+// Simple SVG Radar Chart Component
+const RadarChart = ({ dna }: { dna: { creative: number; analytical: number; visual: number; auditory: number } }) => {
+  // Center is 100, 100. Radius is 80.
+  const center = 100;
+  const scale = 0.8; // Radius multiplier
+  
+  const getPoint = (value: number, angle: number) => {
+    const r = (value / 100) * 80;
+    const x = center + r * Math.cos(angle);
+    const y = center + r * Math.sin(angle);
+    return `${x},${y}`;
+  };
+
+  // Angles: Creative (Top, -PI/2), Analytical (Right, 0), Visual (Bottom, PI/2), Auditory (Left, PI)
+  // Actually let's do 4 points evenly distributed: -90, 0, 90, 180 degrees
+  const p1 = getPoint(dna.creative, -Math.PI / 2); // Top
+  const p2 = getPoint(dna.analytical, 0);          // Right
+  const p3 = getPoint(dna.visual, Math.PI / 2);    // Bottom
+  const p4 = getPoint(dna.auditory, Math.PI);      // Left
+
+  const polyPoints = `${p1} ${p2} ${p3} ${p4}`;
+
+  return (
+    <svg viewBox="0 0 200 200" className="w-full h-full">
+      {/* Background Webs */}
+      {[25, 50, 75, 100].map(p => {
+         const r = (p/100) * 80;
+         const pts = `${center + r * Math.cos(-Math.PI/2)},${center + r * Math.sin(-Math.PI/2)} ` +
+                     `${center + r * Math.cos(0)},${center + r * Math.sin(0)} ` +
+                     `${center + r * Math.cos(Math.PI/2)},${center + r * Math.sin(Math.PI/2)} ` +
+                     `${center + r * Math.cos(Math.PI)},${center + r * Math.sin(Math.PI)}`;
+         return <polygon key={p} points={pts} fill="none" stroke="#333" strokeWidth="1" />
+      })}
+      
+      {/* Axes */}
+      <line x1="100" y1="20" x2="100" y2="180" stroke="#333" />
+      <line x1="20" y1="100" x2="180" y2="100" stroke="#333" />
+
+      {/* Data Shape */}
+      <polygon points={polyPoints} fill="rgba(0, 255, 209, 0.3)" stroke="#00FFD1" strokeWidth="2" />
+
+      {/* Labels */}
+      <text x="100" y="15" textAnchor="middle" fill="#ccc" fontSize="10">Creative</text>
+      <text x="190" y="105" textAnchor="middle" fill="#ccc" fontSize="10">Analytical</text>
+      <text x="100" y="195" textAnchor="middle" fill="#ccc" fontSize="10">Visual</text>
+      <text x="10" y="105" textAnchor="middle" fill="#ccc" fontSize="10">Auditory</text>
+    </svg>
+  );
 };
 
 export const Profile: React.FC = () => {
@@ -45,7 +103,6 @@ export const Profile: React.FC = () => {
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
 
   useEffect(() => {
-    // Load AI suggestions on mount
     suggestSkills(user.bio).then(setSuggestedSkills);
   }, [user.bio]);
 
@@ -53,7 +110,6 @@ export const Profile: React.FC = () => {
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
       {/* Profile Header */}
       <div className="bg-dark-card rounded-3xl shadow-lg border border-dark-border overflow-hidden relative group">
-        {/* Banner */}
         <div className={`h-48 relative ${user.isPro ? 'bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-700' : 'bg-gradient-to-r from-neon-cyan/80 via-blue-600/80 to-neon-purple/80'}`}>
             <div className="absolute inset-0 bg-black/20"></div>
             {user.isPro && (
@@ -105,8 +161,26 @@ export const Profile: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Col: Skills */}
+        {/* Left Col: Skill DNA & Skills */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Skill DNA */}
+          <div className="bg-dark-card p-6 rounded-2xl border border-dark-border shadow-lg">
+            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <Dna className="text-neon-cyan" /> Skill DNA
+            </h2>
+            {user.skillDNA && (
+              <div className="flex flex-col items-center">
+                <div className="w-48 h-48 mb-4">
+                  <RadarChart dna={user.skillDNA} />
+                </div>
+                <div className="text-center">
+                  <p className="text-gray-400 text-sm uppercase tracking-wider">Best Skill Type</p>
+                  <p className="text-lg font-bold text-white">{user.skillDNA.bestType}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
            {/* Offering Column */}
           <div className="bg-dark-card p-6 rounded-2xl border border-dark-border shadow-lg relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-neon-cyan"></div>

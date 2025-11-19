@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigation } from './components/Navigation';
@@ -8,6 +9,8 @@ import { Messages } from './pages/Messages';
 import { CalendarPage } from './pages/Calendar';
 import { ResourcesPage } from './pages/Resources';
 import { ChallengesPage } from './pages/Challenges';
+import { Matchmaking } from './pages/Matchmaking';
+import { CareerPathPage } from './pages/CareerPath';
 
 const App: React.FC = () => {
   return (
@@ -25,6 +28,8 @@ const App: React.FC = () => {
             <Route path="/messages" element={<Messages />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/matchmaking" element={<Matchmaking />} />
+            <Route path="/career" element={<CareerPathPage />} />
           </Routes>
         </main>
       </div>

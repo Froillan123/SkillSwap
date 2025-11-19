@@ -1,4 +1,6 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
+import { CareerPath } from "../types";
 
 const apiKey = process.env.API_KEY || '';
 const ai = new GoogleGenAI({ apiKey });
@@ -79,5 +81,77 @@ export const suggestSkills = async (bio: string): Promise<string[]> => {
     return JSON.parse(response.text || "[]");
   } catch (error) {
     return ["Photography", "Public Speaking", "React.js"];
+  }
+};
+
+export const translateSkillConcept = async (concept: string, analogy: string): Promise<string> => {
+  if (!apiKey) return `Imagine ${concept} but like ${analogy}... (AI Config Missing)`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `Explain the concept of "${concept}" using an analogy related to "${analogy}". Keep it short, fun, and educational (max 3 sentences).`,
+    });
+    return response.text || "Could not translate concept.";
+  } catch (error) {
+    return "AI translator offline.";
+  }
+};
+
+export const generateCareerPath = async (dreamJob: string): Promise<CareerPath> => {
+  if (!apiKey) {
+    return {
+      jobTitle: dreamJob,
+      estimatedSalary: "$80,000 - $120,000",
+      steps: [
+        { title: "Learn Basics", description: "Master the fundamentals.", duration: "1-2 Months", skills: ["Basics"] },
+        { title: "Build Projects", description: "Create a portfolio.", duration: "2-3 Months", skills: ["Project Mgmt"] }
+      ]
+    };
+  }
+
+  try {
+    const prompt = `
+      Create a career roadmap for someone who wants to become a "${dreamJob}".
+      Provide an estimated salary range (USD).
+      Provide 3-4 major steps.
+      Output JSON.
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            jobTitle: { type: Type.STRING },
+            estimatedSalary: { type: Type.STRING },
+            steps: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  title: { type: Type.STRING },
+                  description: { type: Type.STRING },
+                  duration: { type: Type.STRING },
+                  skills: { type: Type.ARRAY, items: { type: Type.STRING } }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    return JSON.parse(response.text || "{}");
+  } catch (error) {
+    console.error(error);
+    return {
+      jobTitle: dreamJob,
+      estimatedSalary: "Unavailable",
+      steps: []
+    };
   }
 };

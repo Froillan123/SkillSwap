@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Search, Filter, Play, BookOpen, Github, ExternalLink, Lock, Zap, Layers } from 'lucide-react';
+import { Search, Filter, Play, BookOpen, Github, ExternalLink, Lock, Zap, Layers, Coins, CheckCircle } from 'lucide-react';
 import { Resource, SkillCategory } from '../types';
 import { generateSkillAdvice } from '../services/geminiService';
 
@@ -14,7 +15,8 @@ const MOCK_RESOURCES: Resource[] = [
     thumbnail: 'https://picsum.photos/seed/react/400/250',
     category: SkillCategory.TECHNOLOGY,
     likes: 1240,
-    isPremium: false
+    isPremium: false,
+    miningReward: 50
   },
   {
     id: '2',
@@ -25,7 +27,8 @@ const MOCK_RESOURCES: Resource[] = [
     thumbnail: 'https://picsum.photos/seed/color/400/250',
     category: SkillCategory.ART,
     likes: 850,
-    isPremium: false
+    isPremium: false,
+    miningReward: 30
   },
   {
     id: '3',
@@ -36,7 +39,8 @@ const MOCK_RESOURCES: Resource[] = [
     thumbnail: 'https://picsum.photos/seed/code/400/250',
     category: SkillCategory.TECHNOLOGY,
     likes: 3200,
-    isPremium: false
+    isPremium: false,
+    miningReward: 45
   },
   {
     id: '4',
@@ -47,7 +51,8 @@ const MOCK_RESOURCES: Resource[] = [
     thumbnail: 'https://picsum.photos/seed/jazz/400/250',
     category: SkillCategory.MUSIC,
     likes: 500,
-    isPremium: true
+    isPremium: true,
+    miningReward: 100
   },
   {
     id: '5',
@@ -58,7 +63,8 @@ const MOCK_RESOURCES: Resource[] = [
     thumbnail: 'https://picsum.photos/seed/spanish/400/250',
     category: SkillCategory.LANGUAGE,
     likes: 15000,
-    isPremium: false
+    isPremium: false,
+    miningReward: 25
   }
 ];
 
@@ -66,13 +72,26 @@ export const ResourcesPage: React.FC = () => {
   const [filter, setFilter] = useState<string>('All');
   const [roadmapLoading, setRoadmapLoading] = useState(false);
   const [generatedRoadmap, setGeneratedRoadmap] = useState<string[] | null>(null);
+  const [minedResources, setMinedResources] = useState<string[]>([]);
+  const [miningProgress, setMiningProgress] = useState<string | null>(null);
 
   const handleGenerateRoadmap = async () => {
     setRoadmapLoading(true);
-    // Simulate AI analyzing the feed content
     const result = await generateSkillAdvice("My current interests based on feed", ["React", "Design"]);
     setGeneratedRoadmap(result.roadmap);
     setRoadmapLoading(false);
+  };
+
+  const handleMine = (id: string) => {
+    if (minedResources.includes(id)) return;
+    
+    setMiningProgress(id);
+    
+    // Simulate "watching/learning" time
+    setTimeout(() => {
+      setMinedResources(prev => [...prev, id]);
+      setMiningProgress(null);
+    }, 2000);
   };
 
   return (
@@ -82,7 +101,7 @@ export const ResourcesPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-white flex items-center gap-2">
             <Layers className="text-neon-purple" /> Global Skill Feed
           </h1>
-          <p className="text-gray-500 mt-1">Curated resources from around the web, tailored to your interests.</p>
+          <p className="text-gray-500 mt-1">Curated resources. Mine skills to earn SkillCoins.</p>
         </div>
         
         <button 
@@ -163,10 +182,42 @@ export const ResourcesPage: React.FC = () => {
                 {res.title}
               </h3>
               
-              <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-800">
-                <span className="text-xs text-gray-500 font-mono">{res.likes.toLocaleString()} interested</span>
-                <button className="text-sm font-bold text-gray-300 hover:text-white flex items-center gap-1">
-                  Open <ExternalLink size={14} />
+              <div className="mt-auto pt-4 border-t border-gray-800">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs text-gray-500 font-mono">{res.likes.toLocaleString()} interested</span>
+                  <button className="text-sm font-bold text-gray-300 hover:text-white flex items-center gap-1">
+                    Open <ExternalLink size={14} />
+                  </button>
+                </div>
+
+                {/* Skill Mining Button */}
+                <button
+                  onClick={() => handleMine(res.id)}
+                  disabled={minedResources.includes(res.id) || miningProgress === res.id}
+                  className={`w-full py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all relative overflow-hidden ${
+                    minedResources.includes(res.id) 
+                      ? 'bg-green-500/20 text-green-400 cursor-default border border-green-500/30'
+                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-700'
+                  }`}
+                >
+                  {/* Progress Bar */}
+                  {miningProgress === res.id && (
+                    <div className="absolute inset-0 bg-neon-cyan/20 animate-pulse">
+                      <div className="h-full bg-neon-cyan/30 w-full transition-all duration-[2000ms] ease-linear origin-left animate-grow"></div>
+                    </div>
+                  )}
+
+                  {minedResources.includes(res.id) ? (
+                    <>
+                      <CheckCircle size={16} /> Mined (+{res.miningReward})
+                    </>
+                  ) : miningProgress === res.id ? (
+                    <>Mining...</>
+                  ) : (
+                    <>
+                      <Coins size={16} className="text-yellow-500" /> Mine {res.miningReward} Coins
+                    </>
+                  )}
                 </button>
               </div>
             </div>

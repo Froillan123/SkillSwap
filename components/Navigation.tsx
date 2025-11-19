@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Home, Search, MessageSquare, User, Calendar, Zap, Globe, Swords } from 'lucide-react';
+import { Home, Search, MessageSquare, User, Calendar, Zap, Globe, Swords, Flame, Briefcase } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface NavItemProps {
@@ -35,9 +36,11 @@ export const Navigation: React.FC = () => {
 
   const navItems = [
     { to: '/', icon: Home, label: 'Dashboard' },
-    { to: '/resources', icon: Globe, label: 'Skill Feed', isNew: true },
+    { to: '/matchmaking', icon: Flame, label: 'Skill Match', isNew: true },
+    { to: '/resources', icon: Globe, label: 'Skill Feed' },
     { to: '/marketplace', icon: Search, label: 'Marketplace' },
-    { to: '/challenges', icon: Swords, label: 'Challenges', isNew: true },
+    { to: '/challenges', icon: Swords, label: 'Challenges' },
+    { to: '/career', icon: Briefcase, label: 'Career Path', isNew: true },
     { to: '/calendar', icon: Calendar, label: 'Schedule' },
     { to: '/messages', icon: MessageSquare, label: 'Messages' },
     { to: '/profile', icon: User, label: 'Profile' },
@@ -90,7 +93,7 @@ export const Navigation: React.FC = () => {
       </nav>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-dark-card border-t border-dark-border px-6 py-3 z-50 flex justify-between items-center pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.5)] overflow-x-auto">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-dark-card border-t border-dark-border px-6 py-3 z-50 flex justify-between items-center pb-safe shadow-[0_-5px_20px_rgba(0,0,0,0.5)] overflow-x-auto no-scrollbar">
         {navItems.map((item) => (
           <Link
             key={item.to}

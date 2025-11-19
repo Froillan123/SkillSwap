@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
-import { Trophy, Star, BookOpen, Flame, ArrowRight, Sparkles, Loader, Clock, Zap } from 'lucide-react';
+import { Trophy, Star, BookOpen, Flame, ArrowRight, Sparkles, Loader, Clock, Zap, Shuffle, Coins } from 'lucide-react';
 import { User } from '../types';
-import { generateSkillAdvice } from '../services/geminiService';
+import { generateSkillAdvice, translateSkillConcept } from '../services/geminiService';
 import { Link } from 'react-router-dom';
 
 const MOCK_USER: User = {
@@ -13,22 +14,31 @@ const MOCK_USER: User = {
   level: 12,
   badges: ['Top Teacher', 'Fast Learner', 'Community Pillar'],
   skillsOffered: [],
-  skillsWanted: []
+  skillsWanted: [],
+  wallet: {
+    skillCoins: 450
+  }
 };
 
-const AICoachWidget = () => {
+const AIWidget = () => {
+  const [mode, setMode] = useState<'coach' | 'translator'>('coach');
   const [query, setQuery] = useState('');
-  const [advice, setAdvice] = useState<{ advice: string; roadmap: string[] } | null>(null);
+  const [analogy, setAnalogy] = useState(''); // For translator
+  const [result, setResult] = useState<{ advice?: string; roadmap?: string[]; translation?: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleAsk = async () => {
+  const handleAction = async () => {
     if (!query.trim()) return;
     setLoading(true);
-    setAdvice(null);
-    
-    // Pass simulated known skills
-    const result = await generateSkillAdvice(query, ["JavaScript", "React", "Piano"]);
-    setAdvice(result);
+    setResult(null);
+
+    if (mode === 'coach') {
+      const res = await generateSkillAdvice(query, ["JavaScript", "React", "Piano"]);
+      setResult(res);
+    } else {
+      const text = await translateSkillConcept(query, analogy || "cooking");
+      setResult({ translation: text });
+    }
     setLoading(false);
   };
 
@@ -36,46 +46,84 @@ const AICoachWidget = () => {
     <div className="bg-dark-card border border-neon-cyan/30 rounded-2xl p-6 shadow-[0_0_20px_rgba(0,255,209,0.05)] relative overflow-hidden group hover:border-neon-cyan/60 transition-all duration-500">
       <div className="absolute top-0 right-0 w-64 h-64 bg-neon-cyan/5 rounded-full -translate-y-32 translate-x-20 blur-3xl pointer-events-none"></div>
       
-      <div className="flex items-center gap-2 mb-4 relative z-10">
-        <Sparkles className="text-neon-cyan animate-pulse" size={20} />
-        <h2 className="text-lg font-bold text-white tracking-wide">AI Skill Coach</h2>
+      <div className="flex justify-between items-center mb-4 relative z-10">
+        <div className="flex items-center gap-2">
+           <Sparkles className="text-neon-cyan animate-pulse" size={20} />
+           <h2 className="text-lg font-bold text-white tracking-wide">AI Assistant</h2>
+        </div>
+        <div className="flex bg-black/40 rounded-lg p-1 text-xs font-bold border border-gray-700">
+          <button 
+            onClick={() => { setMode('coach'); setResult(null); }}
+            className={`px-3 py-1 rounded ${mode === 'coach' ? 'bg-neon-cyan text-black' : 'text-gray-400 hover:text-white'}`}
+          >
+            Coach
+          </button>
+          <button 
+             onClick={() => { setMode('translator'); setResult(null); }}
+             className={`px-3 py-1 rounded ${mode === 'translator' ? 'bg-neon-cyan text-black' : 'text-gray-400 hover:text-white'}`}
+          >
+            Translator
+          </button>
+        </div>
       </div>
       
       <p className="text-gray-400 mb-4 text-sm">
-        Sync your neural network. Ask for a personalized learning roadmap.
+        {mode === 'coach' ? 'Ask for a personalized learning roadmap.' : 'Translate complex ideas into simple analogies.'}
       </p>
 
-      <div className="flex gap-2 mb-4 relative z-10">
+      <div className="space-y-2 mb-4 relative z-10">
         <input 
           type="text" 
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="I want to learn..."
-          className="flex-1 bg-[#121212] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-all font-mono text-sm"
-          onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
+          placeholder={mode === 'coach' ? "I want to learn..." : "Concept (e.g. Recursion)"}
+          className="w-full bg-[#121212] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-all font-mono text-sm"
+          onKeyDown={(e) => e.key === 'Enter' && handleAction()}
         />
+        
+        {mode === 'translator' && (
+          <input 
+            type="text" 
+            value={analogy}
+            onChange={(e) => setAnalogy(e.target.value)}
+            placeholder="Using analogy... (e.g. Basketball, Cooking)"
+            className="w-full bg-[#121212] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-all font-mono text-sm"
+            onKeyDown={(e) => e.key === 'Enter' && handleAction()}
+          />
+        )}
+
         <button 
-          onClick={handleAsk}
+          onClick={handleAction}
           disabled={loading}
-          className="bg-neon-cyan text-black px-4 py-2 rounded-lg font-bold hover:shadow-[0_0_15px_#00FFD1] transition-all disabled:opacity-50 disabled:hover:shadow-none"
+          className="w-full bg-neon-cyan text-black px-4 py-2 rounded-lg font-bold hover:shadow-[0_0_15px_#00FFD1] transition-all disabled:opacity-50 disabled:hover:shadow-none flex justify-center"
         >
-          {loading ? <Loader className="animate-spin" size={20} /> : <ArrowRight size={20} />}
+          {loading ? <Loader className="animate-spin" size={20} /> : (mode === 'coach' ? 'Generate Plan' : 'Translate Concept')}
         </button>
       </div>
 
-      {advice && (
+      {result && (
         <div className="bg-[#121212]/80 backdrop-blur-sm rounded-xl p-4 border border-gray-800 animate-in fade-in slide-in-from-bottom-4">
-          <p className="text-sm text-gray-300 mb-4 leading-relaxed border-l-2 border-neon-cyan pl-3">{advice.advice}</p>
-          <ul className="space-y-3">
-            {advice.roadmap.map((step, idx) => (
-              <li key={idx} className="flex items-start gap-3 text-xs text-gray-400">
-                <span className="bg-gray-800 text-neon-cyan font-mono w-5 h-5 rounded flex items-center justify-center text-[10px] flex-shrink-0 border border-gray-700">
-                  {idx + 1}
-                </span>
-                <span className="pt-0.5">{step}</span>
-              </li>
-            ))}
-          </ul>
+          {mode === 'coach' && result.advice && (
+            <>
+              <p className="text-sm text-gray-300 mb-4 leading-relaxed border-l-2 border-neon-cyan pl-3">{result.advice}</p>
+              <ul className="space-y-3">
+                {result.roadmap?.map((step, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-xs text-gray-400">
+                    <span className="bg-gray-800 text-neon-cyan font-mono w-5 h-5 rounded flex items-center justify-center text-[10px] flex-shrink-0 border border-gray-700">
+                      {idx + 1}
+                    </span>
+                    <span className="pt-0.5">{step}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {mode === 'translator' && result.translation && (
+            <div className="flex gap-3">
+              <Shuffle className="text-neon-cyan flex-shrink-0" size={20} />
+              <p className="text-sm text-white italic">"{result.translation}"</p>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -95,11 +143,11 @@ export const Dashboard: React.FC = () => {
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-3 bg-dark-card px-5 py-3 rounded-xl border border-dark-border shadow-lg hover:border-neon-cyan/50 transition-colors">
             <div className="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center text-yellow-500 border border-yellow-500/20">
-              <Trophy size={20} />
+              <Coins size={20} />
             </div>
             <div>
-              <p className="text-[10px] text-gray-500 font-mono uppercase tracking-wider">Reputation</p>
-              <p className="text-xl font-bold text-white">{MOCK_USER.reputationPoints}</p>
+              <p className="text-[10px] text-gray-500 font-mono uppercase tracking-wider">SkillCoins</p>
+              <p className="text-xl font-bold text-white">{MOCK_USER.wallet?.skillCoins}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-dark-card px-5 py-3 rounded-xl border border-dark-border shadow-lg hover:border-neon-red/50 transition-colors">
@@ -135,7 +183,7 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Col: AI & Up Next */}
         <div className="lg:col-span-2 space-y-8">
-          <AICoachWidget />
+          <AIWidget />
 
           <div>
             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">

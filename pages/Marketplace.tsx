@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Search, Filter, Star, Clock, User as UserIcon, Briefcase, Zap, CheckCircle } from 'lucide-react';
+import { Search, Filter, Star, Clock, User as UserIcon, Briefcase, Zap, CheckCircle, X, Calendar } from 'lucide-react';
 import { SkillCategory, Mentor } from '../types';
 
 // Combined type for display
@@ -87,10 +88,94 @@ const MOCK_LISTINGS: MarketplaceListing[] = [
   }
 ];
 
+// Modal Component
+const BookingModal = ({ 
+  listing, 
+  onClose, 
+  onConfirm 
+}: { 
+  listing: MarketplaceListing; 
+  onClose: () => void; 
+  onConfirm: () => void; 
+}) => {
+  const [step, setStep] = useState(1);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-dark-card w-full max-w-md rounded-2xl border border-dark-border shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="p-4 border-b border-gray-800 flex justify-between items-center">
+          <h3 className="text-xl font-bold text-white">
+            {listing.type === 'mentor' ? 'Hire Mentor' : 'Request Swap'}
+          </h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-white"><X size={24} /></button>
+        </div>
+
+        {step === 1 ? (
+          <div className="p-6 space-y-6">
+            <div className="flex items-center gap-4">
+              <img src={listing.avatar} className="w-16 h-16 rounded-full object-cover border-2 border-gray-700" alt="" />
+              <div>
+                <p className="font-bold text-white text-lg">{listing.name}</p>
+                <p className="text-gray-400">{listing.skillName}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-300">Select Date</label>
+              <input type="date" className="w-full bg-dark-bg border border-gray-700 rounded-lg p-3 text-white focus:border-neon-cyan outline-none" />
+              
+              <label className="block text-sm font-bold text-gray-300">Select Time</label>
+              <select className="w-full bg-dark-bg border border-gray-700 rounded-lg p-3 text-white focus:border-neon-cyan outline-none">
+                <option>10:00 AM</option>
+                <option>02:00 PM</option>
+                <option>04:30 PM</option>
+              </select>
+            </div>
+
+            {listing.type === 'mentor' && (
+              <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl flex justify-between items-center">
+                <span className="text-yellow-500 font-bold">Total (1 hr)</span>
+                <span className="text-white font-bold text-xl">${listing.hourlyRate}</span>
+              </div>
+            )}
+
+            <button 
+              onClick={() => setStep(2)}
+              className="w-full py-3 rounded-xl bg-neon-cyan text-black font-bold hover:bg-white transition-colors"
+            >
+              {listing.type === 'mentor' ? 'Proceed to Payment' : 'Send Request'}
+            </button>
+          </div>
+        ) : (
+          <div className="p-8 text-center space-y-4">
+            <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle size={40} />
+            </div>
+            <h3 className="text-2xl font-bold text-white">Success!</h3>
+            <p className="text-gray-400">
+              {listing.type === 'mentor' 
+                ? 'Your session has been booked. Check your email for details.' 
+                : 'Swap request sent! Wait for them to accept.'}
+            </p>
+            <button 
+              onClick={onConfirm}
+              className="w-full py-3 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors mt-4"
+            >
+              Close
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export const Marketplace: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeTab, setActiveTab] = useState<'peer' | 'mentor'>('peer');
+  const [selectedListing, setSelectedListing] = useState<MarketplaceListing | null>(null);
 
   const filteredListings = MOCK_LISTINGS.filter(listing => {
     const matchesSearch = listing.skillName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -102,6 +187,14 @@ export const Marketplace: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {selectedListing && (
+        <BookingModal 
+          listing={selectedListing} 
+          onClose={() => setSelectedListing(null)} 
+          onConfirm={() => setSelectedListing(null)}
+        />
+      )}
+
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold text-white">Skill Marketplace</h1>
         <p className="text-gray-500">Find your next mentor or swap partner in the network.</p>
@@ -219,7 +312,9 @@ export const Marketplace: React.FC = () => {
                   </span>
                 )}
                 
-                <button className={`text-sm font-bold px-4 py-2 rounded-lg transition-all ${
+                <button 
+                  onClick={() => setSelectedListing(listing)}
+                  className={`text-sm font-bold px-4 py-2 rounded-lg transition-all ${
                   listing.type === 'mentor' 
                     ? 'bg-yellow-500 text-black hover:bg-yellow-400' 
                     : 'text-neon-cyan hover:text-white flex items-center gap-1'

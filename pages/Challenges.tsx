@@ -1,8 +1,9 @@
-import React from 'react';
-import { Trophy, Flame, Clock, Users, ArrowRight, Target } from 'lucide-react';
+
+import React, { useState } from 'react';
+import { Trophy, Flame, Clock, Users, ArrowRight, Target, Check } from 'lucide-react';
 import { Challenge } from '../types';
 
-const MOCK_CHALLENGES: Challenge[] = [
+const INITIAL_CHALLENGES: Challenge[] = [
   {
     id: '1',
     title: 'Speed Coding: React Components',
@@ -11,7 +12,8 @@ const MOCK_CHALLENGES: Challenge[] = [
     timeLeft: '4h 20m',
     prize: '500 XP + Gold Badge',
     image: 'https://picsum.photos/seed/code/400/200',
-    difficulty: 'Hard'
+    difficulty: 'Hard',
+    userJoined: false
   },
   {
     id: '2',
@@ -21,7 +23,8 @@ const MOCK_CHALLENGES: Challenge[] = [
     timeLeft: '12h 00m',
     prize: '300 XP + Featured Profile',
     image: 'https://picsum.photos/seed/design/400/200',
-    difficulty: 'Medium'
+    difficulty: 'Medium',
+    userJoined: false
   },
   {
     id: '3',
@@ -31,11 +34,23 @@ const MOCK_CHALLENGES: Challenge[] = [
     timeLeft: '1d 4h',
     prize: '200 XP',
     image: 'https://picsum.photos/seed/french/400/200',
-    difficulty: 'Easy'
+    difficulty: 'Easy',
+    userJoined: true // Mock existing join
   }
 ];
 
 export const ChallengesPage: React.FC = () => {
+  const [challenges, setChallenges] = useState(INITIAL_CHALLENGES);
+
+  const handleJoin = (id: string) => {
+    setChallenges(prev => prev.map(c => {
+      if (c.id === id) {
+        return { ...c, userJoined: !c.userJoined, participants: c.userJoined ? c.participants - 1 : c.participants + 1 };
+      }
+      return c;
+    }));
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="text-center max-w-2xl mx-auto mb-12">
@@ -108,7 +123,7 @@ export const ChallengesPage: React.FC = () => {
       {/* Challenge Grid */}
       <h3 className="text-2xl font-bold text-white mt-12 mb-6">Active Challenges</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {MOCK_CHALLENGES.map((challenge) => (
+        {challenges.map((challenge) => (
           <div key={challenge.id} className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden hover:border-gray-600 transition-all group">
             <div className="h-40 bg-cover bg-center relative" style={{backgroundImage: `url(${challenge.image})`}}>
               <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors"></div>
@@ -129,8 +144,15 @@ export const ChallengesPage: React.FC = () => {
                 <span className="text-yellow-500 text-xs font-bold flex items-center gap-1">
                    <Target size={12} /> {challenge.prize}
                 </span>
-                <button className="p-2 rounded-full bg-white/5 text-white hover:bg-neon-cyan hover:text-black transition-colors">
-                  <ArrowRight size={18} />
+                <button 
+                  onClick={() => handleJoin(challenge.id)}
+                  className={`p-2 rounded-full transition-all ${
+                    challenge.userJoined 
+                    ? 'bg-green-500/20 text-green-500 hover:bg-red-500/20 hover:text-red-500' 
+                    : 'bg-white/5 text-white hover:bg-neon-cyan hover:text-black'
+                  }`}
+                >
+                  {challenge.userJoined ? <Check size={18} /> : <ArrowRight size={18} />}
                 </button>
               </div>
             </div>
