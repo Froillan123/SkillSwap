@@ -1,0 +1,8 @@
+{
+  "name": "Copy of SkillSwap",
+  "description": "A peer-to-peer learning exchange platform where users swap skills, earn points, and learn together using AI-powered matching.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
